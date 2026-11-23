@@ -1,1 +1,33 @@
+name: Atualizar EPG Alemanha
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Gerar epg.xml atualizado
+        run: python gerar_epg.py
+
+      - name: Salvar alterações no GitHub
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add epg.xml
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Atualizar EPG" && git push)
 
